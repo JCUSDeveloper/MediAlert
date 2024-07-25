@@ -13,6 +13,31 @@
         android:theme="@style/Theme.MediAlert"
         tools:targetApi="31">
         <activity
+            android:name=".profile"
+            android:exported="false" />
+        <activity
+            android:name=".newTreatment"
+            android:exported="false" />
+        <activity
+            android:name=".menu"
+            android:exported="false" />
+        <activity
+            android:name=".login"
+            android:exported="false" />
+        <activity
+            android:name=".editTreatment"
+            android:exported="false" />
+        <activity
+            android:name=".editProfile"
+            android:exported="false" />
+        <activity
+            android:name=".createAccount"
+            android:exported="false" />
+        <activity
+            android:name=".connectPillbox"
+            android:exported="false"
+            android:theme="@style/Theme.MediAlert" />
+        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
