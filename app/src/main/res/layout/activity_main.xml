@@ -14,19 +14,19 @@
         android:id="@+id/welcome_message"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="35dp"
         android:text="¡Bienvenido a MediAlert!"
         android:textSize="30sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:textColor="@color/white"/>
+        android:textColor="@color/dark_gray"/>
 
     <ImageView
         android:id="@+id/logo"
-        android:layout_width="261dp"
-        android:layout_height="243dp"
+        android:layout_width="396dp"
+        android:layout_height="331dp"
         android:layout_marginTop="52dp"
         android:src="@drawable/logo"
         app:layout_constraintEnd_toEndOf="parent"
@@ -36,15 +36,15 @@
     <TextView
         android:layout_width="305dp"
         android:layout_height="53dp"
+        android:layout_marginTop="60dp"
         android:gravity="center"
         android:text="Inicia sesión o Registrate"
+        android:textColor="@color/dark_gray"
         android:textSize="25sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        tools:layout_editor_absoluteY="-8dp"
-        android:textColor="@color/white"
-        tools:ignore="MissingConstraints" />
+        app:layout_constraintTop_toBottomOf="@+id/logo" />
 
     <Button
         android:id="@+id/login_button"
@@ -55,7 +55,7 @@
         android:layout_marginBottom="12dp"
         android:backgroundTint="@color/button_color"
 
-        android:text="Iniciar sesión"
+        android:text="INICIAR SESION"
         android:textColor="@color/white"
         android:textSize="25dp"
         app:layout_constraintBottom_toTopOf="@+id/register_button"
@@ -71,7 +71,7 @@
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="92dp"
         android:backgroundTint="@color/button_color"
-        android:text="Registrate"
+        android:text="REGISTRATE"
         android:textColor="@color/white"
         android:textSize="25dp"
         app:layout_constraintBottom_toBottomOf="parent"

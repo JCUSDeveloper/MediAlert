@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/fondo"
+    android:id="@+id/profile"
     tools:context=".profile">
 
     <ImageView
@@ -34,17 +35,19 @@
         android:layout_marginTop="16dp"
         android:text="Perfil"
         android:textSize="30sp"
+        android:textColor="@color/dark_gray"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/logo" />
+        app:layout_constraintTop_toBottomOf="@+id/logo"
+        />
 
     <androidx.cardview.widget.CardView
         android:layout_width="350dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="50dp"
         android:backgroundTint="@android:color/white"
-        app:cardCornerRadius="4dp"
+        app:cardCornerRadius="30dp"
         app:cardElevation="4dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -54,98 +57,108 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
+            android:layout_marginTop="10dp"
             android:padding="16dp">
 
             <!-- Nombre -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Nombre"
-                android:textSize="14sp"
                 android:layout_marginBottom="8dp"
+                android:text="Nombre"
+                android:textColor="@color/dark_gray"
+                android:textSize="14sp"
                 android:textStyle="bold" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Juan"
-                android:textSize="14sp"
-                android:layout_marginBottom="16dp" />
+                android:id="@+id/name_text_view"
+                android:layout_marginBottom="16dp"
+                android:text=""
+                android:textSize="14sp" />
 
             <!-- Email -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Email"
-                android:textSize="14sp"
                 android:layout_marginBottom="8dp"
+                android:text="Email"
+                android:textColor="@color/dark_gray"
+                android:textSize="14sp"
                 android:textStyle="bold" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="teamofrida@nopuedoolvidarte.com"
-                android:textSize="14sp"
-                android:layout_marginBottom="16dp" />
+                android:layout_marginBottom="16dp"
+                android:id="@+id/email_text_view"
+                android:text=""
+                android:textSize="14sp" />
 
             <!-- Contraseña -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Contraseña"
-                android:textSize="14sp"
                 android:layout_marginBottom="8dp"
+                android:text="Contraseña"
+                android:textColor="@color/dark_gray"
+                android:textSize="14sp"
                 android:textStyle="bold" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="********"
+                android:id="@+id/password_text_view"
+                android:layout_marginBottom="16dp"
+                android:hint="·············"
                 android:textSize="14sp"
-                android:layout_marginBottom="16dp" />
+                android:textStyle="bold"/>
 
             <!-- Fecha de Nacimiento -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Fecha de Nacimiento"
-                android:textSize="14sp"
                 android:layout_marginBottom="8dp"
+                android:text="Fecha de Nacimiento"
+                android:textColor="@color/dark_gray"
+                android:textSize="14sp"
                 android:textStyle="bold" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="01/01/1990"
-                android:textSize="14sp"
-                android:layout_marginBottom="16dp" />
+                android:id="@+id/birthdate_text_view"
+                android:layout_marginBottom="16dp"
+                android:text=""
+                android:textSize="14sp" />
 
             <!-- Botones Editar y Regresar -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginBottom="16dp">
+                android:layout_marginBottom="4dp"
+                android:orientation="horizontal">
 
                 <Button
                     android:id="@+id/edit_button"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
                     android:layout_weight="1"
                     android:backgroundTint="@color/button_color"
                     android:text="Editar"
-                    android:textColor="@color/white"
-                    android:layout_marginEnd="8dp" />
+                    android:textColor="@color/white" />
 
                 <Button
                     android:id="@+id/back_button"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
                     android:layout_weight="1"
                     android:backgroundTint="@color/button_color"
                     android:text="Regresar"
-                    android:textColor="@color/white"
-                    android:layout_marginStart="8dp" />
+                    android:textColor="@color/white" />
             </LinearLayout>
         </LinearLayout>
     </androidx.cardview.widget.CardView>

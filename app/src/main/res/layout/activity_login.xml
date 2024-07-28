@@ -21,7 +21,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="116dp"
-        android:text="Iniciar Sessión"
+        android:text="Iniciar Sesión"
+        android:textColor="@color/dark_gray"
         android:textSize="30sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
@@ -33,9 +34,9 @@
 
         android:layout_width="380dp"
         android:layout_height="420dp"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="50dp"
         android:backgroundTint="@android:color/white"
-        app:cardCornerRadius="4dp"
+        app:cardCornerRadius="40dp"
         app:cardElevation="4dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -43,75 +44,67 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="419dp"
             android:orientation="vertical"
             android:padding="16dp">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Inicia para continuar"
-                android:layout_marginBottom="20dp"
-                android:textSize="25sp"
-                android:textStyle="bold"
-                android:layout_gravity="center"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.497"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Correo"
-                android:textSize="16sp"
-                android:layout_marginBottom="8dp" /> <!-- Espacio entre el texto y el input -->
+                android:layout_marginTop="30dp"
+                android:layout_marginBottom="8dp"
+                android:text="Correo Electronico *"
+                android:textColor="@color/dark_gray"
+                android:textSize="16sp" /> <!-- Espacio entre el texto y el input -->
 
             <EditText
                 android:id="@+id/email_input"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="CORREO"
+                android:layout_marginBottom="16dp"
+                android:hint="Correo Electronico"
                 android:inputType="textEmailAddress"
                 android:padding="16dp"
-                android:layout_marginBottom="16dp" /> <!-- Espacio entre el input y el siguiente elemento -->
+                android:textColor="@color/light_gray" /> <!-- Espacio entre el input y el siguiente elemento -->
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Contraseña"
-                android:textSize="16sp"
-                android:layout_marginBottom="8dp" /> <!-- Espacio entre el texto y el input -->
+                android:layout_marginBottom="8dp"
+                android:text="Contraseña *"
+                android:textColor="@color/dark_gray"
+                android:textSize="16sp" /> <!-- Espacio entre el texto y el input -->
 
             <EditText
                 android:id="@+id/password_input"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="CONTRASEÑA"
+                android:layout_marginBottom="26dp"
+                android:hint="Ingrese su contraseña"
                 android:inputType="textPassword"
                 android:padding="16dp"
-                android:layout_marginBottom="26dp" /> <!-- Espacio entre el input y el botón -->
+                android:textColor="@color/light_gray" /> <!-- Espacio entre el input y el botón -->
 
             <Button
                 android:id="@+id/login_button"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:backgroundTint="@color/button_color"
+                android:radius="4dp"
                 android:text="Iniciar sesión"
-                android:textSize="20dp"
                 android:textColor="@color/white"
-                android:radius="4dp" />
+                android:textSize="20dp" />
 
             <TextView
                 android:id="@+id/register_link"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Regístrate aquí"
                 android:layout_gravity="center"
+                android:layout_marginTop="16dp"
+                android:text="Regístrate aquí"
                 android:textColor="@color/button_color"
-                android:textSize="16sp"
-                android:textStyle="italic"
-                android:layout_marginTop="16dp" /> <!-- Espacio entre el botón y el enlace -->
+                android:textSize="16sp" /> <!-- Espacio entre el botón y el enlace -->
 
         </LinearLayout>
 

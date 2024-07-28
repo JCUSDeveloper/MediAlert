@@ -7,11 +7,15 @@
 
     <color name="background_color">#AAE1D4</color>
     <color name="button_color">#113442</color>
-    <color name="dark_green">#5CC1AB</color>
 
-    <color name="light_green">#7ED957</color>
-    <color name="light_yellow">#D8AE02</color>
-    <color name="light_blue">#38B6FF</color>
-    <color name="light_red">#FF5757</color>
+    <color name="dark_green">#5CC1AB</color>
+    <color name="dark_gray">#424242</color>
+
+    <color name="light_green">#BAFF9C</color>
+    <color name="light_gray">#777777</color>
+    <color name="light_yellow">#FBDF69</color>
+    <color name="light_blue">#9BDBFF</color>
+    <color name="light_red">#FB9999</color>
+
 
 </resources>

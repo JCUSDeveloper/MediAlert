@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/fondo"
+    android:id="@+id/editTreatment"
     tools:context=".editTreatment">
 
     <ImageView
@@ -32,6 +33,7 @@
         android:layout_marginTop="128dp"
         android:text="Editar Tratamiento"
         android:textSize="30sp"
+        android:textColor="@color/dark_gray"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
@@ -43,7 +45,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
         android:backgroundTint="@android:color/white"
-        app:cardCornerRadius="4dp"
+        app:cardCornerRadius="40dp"
         app:cardElevation="4dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -61,7 +63,9 @@
                 android:layout_height="wrap_content"
                 android:text="1. Elige el número de tratamiento"
                 android:textSize="14sp"
-                android:layout_marginBottom="8dp" />
+                android:layout_marginBottom="8dp"
+                android:textColor="@color/dark_gray"
+                android:textStyle="bold"/>
 
             <Spinner
                 android:id="@+id/treatment_number_spinner"
@@ -75,7 +79,9 @@
                 android:layout_height="wrap_content"
                 android:text="2. Escribe el nombre del medicamento"
                 android:textSize="14sp"
-                android:layout_marginBottom="8dp" />
+                android:layout_marginBottom="8dp"
+                android:textColor="@color/dark_gray"
+                android:textStyle="bold"/>
 
             <EditText
                 android:id="@+id/medicine_name_input"
@@ -90,21 +96,28 @@
                 android:layout_height="wrap_content"
                 android:text="3. Selecciona la hora de la 1era toma"
                 android:textSize="14sp"
-                android:layout_marginBottom="8dp" />
-
-            <Spinner
-                android:id="@+id/first_dose_time_spinner"
-                android:layout_width="match_parent"
-                android:layout_height="30dp"
-                android:entries="@array/time_array" />
+                android:layout_marginBottom="8dp"
+                android:textColor="@color/dark_gray"
+                android:textStyle="bold"/>
 
             <!-- 4. Escoge la frecuencia de la toma -->
+            <EditText
+                android:id="@+id/timeEditText"
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:hint="Hora de la 1era toma"
+                android:textSize="8dp"
+                android:focusable="false"
+                android:clickable="true"/>
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="4. Escoge la frecuencia de la toma"
                 android:textSize="14sp"
-                android:layout_marginBottom="8dp" />
+                android:layout_marginBottom="8dp"
+                android:textColor="@color/dark_gray"
+                android:textStyle="bold"/>
 
             <Spinner
                 android:id="@+id/frequency_spinner"
@@ -118,7 +131,9 @@
                 android:layout_height="wrap_content"
                 android:text="5. Escribe la dosis de medicamento por toma"
                 android:textSize="14sp"
-                android:layout_marginBottom="8dp" />
+                android:layout_marginBottom="8dp"
+                android:textColor="@color/dark_gray"
+                android:textStyle="bold"/>
 
             <EditText
                 android:id="@+id/dose_input"
@@ -134,7 +149,9 @@
                 android:layout_height="wrap_content"
                 android:text="6. Escribe la cantidad de medicamento en el compartimiento"
                 android:textSize="14sp"
-                android:layout_marginBottom="8dp" />
+                android:layout_marginBottom="8dp"
+                android:textColor="@color/dark_gray"
+                android:textStyle="bold"/>
 
             <EditText
                 android:id="@+id/compartment_quantity_input"
@@ -148,9 +165,10 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="11dp"
+                android:textSize="13dp"
                 android:text="Advertencia: no sobrecargar de medicamento el compartimiento"
-                android:textColor="@color/red" />
+                android:textColor="@color/red"
+                android:textStyle="bold"/>
 
             <!-- Botones Guardar y Cancelar -->
             <LinearLayout

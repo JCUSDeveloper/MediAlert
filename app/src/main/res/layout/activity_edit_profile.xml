@@ -4,6 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/fondo"
+    android:id="@+id/edit_profile"
     tools:context=".editProfile">
 
     <ImageView
@@ -32,6 +33,7 @@
         android:layout_marginTop="4dp"
         android:text="Editar Perfil"
         android:textSize="30sp"
+        android:textColor="@color/dark_gray"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -40,9 +42,9 @@
     <androidx.cardview.widget.CardView
         android:layout_width="350dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="50dp"
         android:backgroundTint="@android:color/white"
-        app:cardCornerRadius="4dp"
+        app:cardCornerRadius="30dp"
         app:cardElevation="4dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -52,6 +54,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
+            android:layout_marginTop="10dp"
             android:padding="16dp">
 
             <!-- Nombre -->
@@ -61,13 +64,13 @@
                 android:text="Nombre"
                 android:textSize="14sp"
                 android:layout_marginBottom="8dp"
+                android:textColor="@color/dark_gray"
                 android:textStyle="bold" />
 
             <EditText
                 android:id="@+id/name_input"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Juan"
                 android:textSize="14sp"
                 android:layout_marginBottom="16dp" />
 
@@ -78,13 +81,13 @@
                 android:text="Email"
                 android:textSize="14sp"
                 android:layout_marginBottom="8dp"
-                android:textStyle="bold" />
+                android:textColor="@color/dark_gray"
+                android:textStyle="bold"  />
 
             <EditText
-                android:id="@+id/lastname_input"
+                android:id="@+id/email_input"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="teamofrida@nopuedoolvidarte.com"
                 android:textSize="14sp"
                 android:layout_marginBottom="16dp" />
 
@@ -95,16 +98,18 @@
                 android:text="Contraseña"
                 android:textSize="14sp"
                 android:layout_marginBottom="8dp"
-                android:textStyle="bold" />
+                android:textColor="@color/dark_gray"
+                android:textStyle="bold"  />
 
-            <EditText
+            <TextView
                 android:id="@+id/password_input"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="********"
                 android:textSize="14sp"
                 android:inputType="textPassword"
-                android:layout_marginBottom="16dp" />
+                android:layout_marginBottom="16dp"
+                />
 
             <!-- Fecha de Nacimiento -->
             <TextView
@@ -113,22 +118,24 @@
                 android:text="Fecha de Nacimiento"
                 android:textSize="14sp"
                 android:layout_marginBottom="8dp"
-                android:textStyle="bold" />
+                android:textColor="@color/dark_gray"
+                android:textStyle="bold"  />
 
+            <!-- Botones Guardar y Cancelar -->
             <EditText
                 android:id="@+id/birthdate_input"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="01/01/1990"
+                android:layout_marginBottom="16dp"
                 android:textSize="14sp"
-                android:layout_marginBottom="16dp" />
+                android:focusable="false"
+                android:clickable="true"/>
 
-            <!-- Botones Guardar y Cancelar -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:layout_marginBottom="16dp">
+                android:layout_marginBottom="4dp">
 
                 <Button
                     android:id="@+id/save_button"
