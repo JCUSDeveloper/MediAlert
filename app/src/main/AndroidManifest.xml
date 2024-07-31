@@ -16,7 +16,7 @@
             android:name=".profile"
             android:exported="false" />
         <activity
-            android:name=".newTreatment"
+            android:name=".MainActivity"
             android:exported="false" />
         <activity
             android:name=".menu"
@@ -38,7 +38,7 @@
             android:exported="false"
             android:theme="@style/Theme.MediAlert" />
         <activity
-            android:name=".MainActivity"
+            android:name=".newTreatment"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -48,6 +48,12 @@
         </activity>
     </application>
 
+    <uses-permission android:name="android.permission.BLUETOOTH"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_SCAN"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"
+        tools:ignore="CoarseFineLocation" />
     <uses-permission android:name="android.permission.INTERNET"/>
 
 </manifest>

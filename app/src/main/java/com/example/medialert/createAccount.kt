@@ -116,7 +116,7 @@ class createAccount : AppCompatActivity() {
                 } else {
                     SweetAlertDialog(this, SweetAlertDialog.WARNING_TYPE)
                         .setTitleText("Contraseña Inválida")
-                        .setContentText("La contraseña debe tener al menos 8 caracteres, incluir al menos una letra mayúscula, una letra minúscula y un carácter especial.")
+                        .setContentText("La contraseña debe tener al menos 8 caracteres, incluir al menos una letra mayúscula, una letra minúscula y un carácter especial (@).")
                         .setConfirmText("OK")
                         .setConfirmClickListener {
                             it.dismissWithAnimation()

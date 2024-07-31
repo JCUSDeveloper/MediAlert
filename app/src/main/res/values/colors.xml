@@ -14,8 +14,10 @@
     <color name="light_green">#BAFF9C</color>
     <color name="light_gray">#777777</color>
     <color name="light_yellow">#FBDF69</color>
-    <color name="light_blue">#9BDBFF</color>
+    <color name="light_blue">#B0E2FD</color>
     <color name="light_red">#FB9999</color>
+    <color name="Super_light_blue">#EFFBF9</color>
 
+    <color name="numberPickerBackground">#FFFFFFFF</color>
 
 </resources>

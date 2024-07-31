@@ -4,8 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/fondo"
-    tools:context=".newTreatment"
-    android:id="@+id/newTreatment">
+    android:id="@+id/newTreatment"
+    tools:context=".newTreatment">
 
     <ImageView
         android:id="@+id/user"
@@ -32,8 +32,8 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="128dp"
         android:text="Nuevo Tratamiento"
-        android:textColor="@color/dark_gray"
         android:textSize="30sp"
+        android:textColor="@color/dark_gray"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
@@ -61,22 +61,24 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="1. Elige el número de tratamiento"
+                android:text="1. Elige el Compartimento"
                 android:textSize="14sp"
+                android:layout_marginBottom="8dp"
                 android:textColor="@color/dark_gray"
-                android:textStyle="bold"
-                android:layout_marginBottom="8dp" />
+                android:textStyle="bold"/>
 
             <Spinner
                 android:id="@+id/treatment_number_spinner"
                 android:layout_width="match_parent"
-                android:layout_height="30dp"
-                android:entries="@array/treatment_number_array" />
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:entries="@array/treatment_number_array"
+                style="@style/CustomSpinnerStyle" />
 
             <!-- 2. Escribe el nombre del medicamento -->
             <TextView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:text="2. Escribe el nombre del medicamento"
                 android:textSize="14sp"
                 android:layout_marginBottom="8dp"
@@ -88,6 +90,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="16dp"
+                android:textColor="@color/dark_gray"
                 android:hint="Nombre del medicamento" />
 
             <!-- 3. Selecciona la hora de la 1era toma -->
@@ -100,33 +103,39 @@
                 android:textColor="@color/dark_gray"
                 android:textStyle="bold"/>
 
+            <!-- 4. Escoge la frecuencia de la toma -->
             <EditText
                 android:id="@+id/timeEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="5dp"
-                android:layout_marginLeft="1dp"
-                android:hint="00:00"
-                android:textSize="16sp"
-                android:focusable="false"
+                android:layout_marginBottom="8dp"
                 android:clickable="true"
-                style="@style/EditTextNoUnderline"/>
+                android:focusable="false"
+                android:hint="00:00"
+                android:textSize="16dp"
+                android:textColor="@color/dark_gray"
+                style="@style/EditTextNoUnderline" />
 
-            <!-- 4. Escoge la frecuencia de la toma -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="4. Escoge la frecuencia de la toma"
+                android:text="4. Frecuencia (Por Hora)"
                 android:textSize="14sp"
+                android:layout_marginBottom="8dp"
                 android:textColor="@color/dark_gray"
-                android:textStyle="bold"
-                android:layout_marginBottom="8dp" />
+                android:textStyle="bold"/>
 
-            <Spinner
-                android:id="@+id/frequency_spinner"
+            <EditText
+                android:id="@+id/frequency_input"
                 android:layout_width="match_parent"
-                android:layout_height="30dp"
-                android:entries="@array/frequency_array" />
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:hint="00:00"
+                android:textSize="16dp"
+                android:textColor="@color/dark_gray"
+                android:focusable="false"
+                android:clickable="true"
+                style="@style/EditTextNoUnderline" />
 
             <!-- 5. Escribe la dosis de medicamento por toma -->
             <TextView
@@ -144,6 +153,7 @@
                 android:layout_height="wrap_content"
                 android:hint="Dosis"
                 android:textSize="16dp"
+                android:textColor="@color/dark_gray"
                 android:inputType="number" />
 
             <!-- 6. Escribe la cantidad de medicamento en el compartimiento -->
@@ -162,7 +172,8 @@
                 android:layout_height="wrap_content"
                 android:hint="Cantidad"
                 android:textSize="16dp"
-                android:inputType="number" />
+                android:inputType="number"
+                android:textColor="@color/dark_gray"/>
 
             <!-- Advertencia -->
             <TextView

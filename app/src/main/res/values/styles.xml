@@ -14,8 +14,39 @@
         <!-- Puedes añadir más personalizaciones según sea necesario -->
     </style>
 
+    <!-- Estilo para el NumberPicker -->
+    <style name="CustomNumberPicker">
+        <item name="android:orientation">horizontal</item>
+        <item name="android:background">@color/numberPickerBackground</item>
+        <item name="android:textColor">@color/dark_green</item>
+    </style>
+
+    <!-- Estilo para el TimePickerDialog -->
+    <style name="CustomTimePickerDialog" parent="Theme.AppCompat.Light.Dialog">
+        <item name="android:timePickerStyle">@style/MyTimePickerStyle</item>
+    </style>
+
+    <!-- Estilo para el TimePicker -->
+    <style name="MyTimePickerStyle" parent="android:Widget.Material.TimePicker">
+        <item name="android:headerBackground">@color/button_color</item>
+        <item name="android:numbersTextColor">@color/dark_green</item>
+        <item name="android:timePickerMode">spinner</item>
+        <!-- Puedes añadir más personalizaciones según sea necesario -->
+    </style>
+
+    <!-- Estilo para EditText sin subrayado -->
     <style name="EditTextNoUnderline">
         <item name="android:background">@android:color/transparent</item>
+    </style>
+
+    <!-- Estilo para AlertDialog que contiene el NumberPicker -->
+    <style name="CustomAlertDialog" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:background">@color/numberPickerBackground</item>
+    </style>
+
+    <style name="CustomSpinnerStyle" parent="Widget.AppCompat.Spinner">
+        <item name="android:background">@color/white</item>
+        <item name="android:textColor">@color/button_color</item>
     </style>
 
 </resources>

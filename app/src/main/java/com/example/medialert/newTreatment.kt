@@ -1,12 +1,15 @@
 package com.example.medialert
 
+import android.app.AlertDialog
 import android.app.TimePickerDialog
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.widget.Button
-import android.widget.EditText
-import android.widget.Spinner
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import cn.pedant.SweetAlert.SweetAlertDialog
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -24,11 +27,11 @@ class newTreatment : AppCompatActivity() {
         auth = FirebaseAuth.getInstance()
         db = FirebaseFirestore.getInstance()
 
-        // Find views
+
         val treatmentNumberSpinner = findViewById<Spinner>(R.id.treatment_number_spinner)
         val medicineNameInput = findViewById<EditText>(R.id.medicine_name_input)
         val timeEditText = findViewById<EditText>(R.id.timeEditText)
-        val frequencySpinner = findViewById<Spinner>(R.id.frequency_spinner)
+        val frequencyInput = findViewById<EditText>(R.id.frequency_input)
         val doseInput = findViewById<EditText>(R.id.dose_input)
         val compartmentQuantityInput = findViewById<EditText>(R.id.compartment_quantity_input)
 
@@ -38,11 +41,40 @@ class newTreatment : AppCompatActivity() {
             val hour = calendar.get(Calendar.HOUR_OF_DAY)
             val minute = calendar.get(Calendar.MINUTE)
 
-            val timePickerDialog = TimePickerDialog(this,
+            val timePickerDialog = TimePickerDialog(
+                this, R.style.CustomTimePickerDialog,
                 { _, hourOfDay, minuteOfHour ->
                     timeEditText.setText(String.format("%02d:%02d", hourOfDay, minuteOfHour))
-                }, hour, minute, true)
+                }, hour, minute, true
+            )
             timePickerDialog.show()
+        }
+
+
+        // Set up NumberPicker for frequency input
+        frequencyInput.setOnClickListener {
+            val numberPicker = NumberPicker(this).apply {
+                minValue = 1
+                maxValue = 24
+                wrapSelectorWheel = true
+                // Apply custom styles to the NumberPicker
+                descendantFocusability = NumberPicker.FOCUS_BLOCK_DESCENDANTS
+                setBackgroundColor(ContextCompat.getColor(context, R.color.numberPickerBackground))
+                setDividerColor(this, ContextCompat.getColor(context, R.color.dark_green))
+                // Puedes agregar más personalizaciones aquí
+            }
+
+            AlertDialog.Builder(this, R.style.CustomAlertDialog)
+                .setTitle("Selecciona la frecuencia")
+                .setView(numberPicker)
+                .setPositiveButton("OK") { dialog, _ ->
+                    frequencyInput.setText(numberPicker.value.toString())
+                    dialog.dismiss()
+                }
+                .setNegativeButton("Cancelar") { dialog, _ ->
+                    dialog.dismiss()
+                }
+                .show()
         }
 
         // Save button click listener
@@ -50,7 +82,7 @@ class newTreatment : AppCompatActivity() {
             val treatmentNumber = treatmentNumberSpinner.selectedItem.toString()
             val medicineName = medicineNameInput.text.toString()
             val firstDoseTime = timeEditText.text.toString()
-            val frequency = frequencySpinner.selectedItem.toString()
+            val frequency = frequencyInput.text.toString()
             val dose = doseInput.text.toString()
             val compartmentQuantity = compartmentQuantityInput.text.toString()
 
@@ -99,6 +131,22 @@ class newTreatment : AppCompatActivity() {
             val intent = Intent(this, menu::class.java)
             startActivity(intent)
             finish()
+        }
+    }
+
+    private fun setDividerColor(picker: NumberPicker, color: Int) {
+        try {
+            val fields = NumberPicker::class.java.declaredFields
+            for (field in fields) {
+                if (field.name == "mSelectionDivider") {
+                    field.isAccessible = true
+                    val colorDrawable = ColorDrawable(color)
+                    field.set(picker, colorDrawable)
+                    break
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 }
