@@ -52,6 +52,7 @@
                 android:layout_height="wrap_content"
                 android:text="Nombre Completo *"
                 android:textSize="16sp"
+                android:layout_marginTop="20dp"
                 android:layout_marginBottom="8dp"
                 android:textColor="@color/dark_gray"/> <!-- Espacio entre el texto y el input -->
 
@@ -137,15 +138,33 @@
                 android:layout_marginBottom="26dp"
                 android:textColor="@color/light_gray"/> <!-- Espacio entre el input y el botón -->
 
-            <Button
-                android:id="@+id/register_button"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="60dp"
-                android:backgroundTint="@color/button_color"
-                android:text="Registrarse"
-                android:textSize="20sp"
-                android:textColor="@color/white"
-                android:radius="4dp" />
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/register_button"
+                    android:layout_width="160dp"
+                    android:layout_height="60dp"
+                    android:backgroundTint="@color/button_color"
+                    android:text="Registrarse"
+                    android:textSize="20sp"
+                    android:textColor="@color/white"
+                    android:radius="4dp" />
+
+                <Button
+                    android:id="@+id/volver"
+                    android:layout_width="160dp"
+                    android:layout_height="60dp"
+                    android:layout_marginLeft="8dp"
+                    android:backgroundTint="@color/button_color"
+                    android:text="Volver"
+                    android:textSize="20sp"
+                    android:textColor="@color/white"
+                    android:radius="4dp" />
+
+            </LinearLayout>
 
         </LinearLayout>
 

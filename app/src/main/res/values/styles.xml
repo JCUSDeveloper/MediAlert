@@ -3,6 +3,8 @@
     <!-- Estilo para el DatePickerDialog -->
     <style name="CustomDatePickerDialog" parent="Theme.AppCompat.Light.Dialog">
         <item name="android:datePickerStyle">@style/MyDatePickerStyle</item>
+        <item name="android:textColor">@color/black</item>
+
     </style>
 
     <!-- Estilo para el DatePicker -->
@@ -46,7 +48,7 @@
 
     <style name="CustomSpinnerStyle" parent="Widget.AppCompat.Spinner">
         <item name="android:background">@color/white</item>
-        <item name="android:textColor">@color/button_color</item>
+        <item name="android:textColor">@color/black</item>
     </style>
 
 </resources>

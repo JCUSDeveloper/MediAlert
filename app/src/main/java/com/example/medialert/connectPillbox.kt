@@ -9,33 +9,41 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.widget.AdapterView
-import android.widget.ListView
-import android.widget.Toast
+import android.os.Handler
+import android.os.Looper
+import android.widget.*
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import cn.pedant.SweetAlert.SweetAlertDialog
 import java.io.IOException
+import java.io.InputStream
+import java.io.OutputStream
 import java.util.UUID
 
 class connectPillbox : AppCompatActivity() {
     private val PERMISSION_REQUEST_CODE = 101
     private val REQUEST_ENABLE_BT = 1
     private lateinit var deviceList: ListView
+    private lateinit var enviar: Button
     private val bluetoothAdapter: BluetoothAdapter? = BluetoothAdapter.getDefaultAdapter()
     private val deviceListAdapter by lazy {
         DeviceListAdapter(this, mutableListOf())
+    }
+
+    private val handler = Handler(Looper.getMainLooper()) { message ->
+        //PRUEBA ENVIO DE DATOS
+        val receivdedData = message.obj as String
+        true
     }
 
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             when (intent?.action) {
                 BluetoothDevice.ACTION_FOUND -> {
-                    val device: BluetoothDevice? = intent?.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
+                    val device: BluetoothDevice? = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
                     device?.let {
                         val deviceName = if (ActivityCompat.checkSelfPermission(
                                 this@connectPillbox,
@@ -62,6 +70,7 @@ class connectPillbox : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_connect_pillbox)
+
         deviceList = findViewById(R.id.device_list)
         deviceList.adapter = deviceListAdapter
         deviceList.onItemClickListener = AdapterView.OnItemClickListener { parent, view, position, id ->
@@ -69,13 +78,33 @@ class connectPillbox : AppCompatActivity() {
             val deviceAddress = deviceInfo.split(" - ").last()
             connectToDevice(deviceAddress)
         }
+
+        val statusLight = findViewById<ImageView>(R.id.connection_status_light)
+        val connectionStatus = findViewById<TextView>(R.id.connection_status)
+
+        if (BluetoothManager.isConnected()) {
+            statusLight.setImageResource(R.drawable.successfull_bluetooth)
+            connectionStatus.text = "Estado: Conectado"
+        } else {
+            statusLight.setImageResource(R.drawable.red_light)
+            connectionStatus.text = "Estado: Desconectado"
+        }
+
         checkPermissions()
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.connectPillbox)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+
+        findViewById<Button>(R.id.back_button).setOnClickListener {
+            val intent = Intent(this, menu::class.java)
+            startActivity(intent)
+        }
     }
+
+
 
     private fun checkPermissions() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH) != PackageManager.PERMISSION_GRANTED ||
@@ -102,20 +131,14 @@ class connectPillbox : AppCompatActivity() {
             if (grantResults.isNotEmpty() && grantResults.all { it == PackageManager.PERMISSION_GRANTED }) {
                 startBluetoothDiscovery()
             } else {
-                SweetAlertDialog(this, SweetAlertDialog.ERROR_TYPE)
-                    .setTitleText("Permisos necesarios")
-                    .setContentText("No se han concedido los permisos necesarios")
-                    .show()
+                Toast.makeText(this, "No se han concedido los permisos necesarios", Toast.LENGTH_LONG).show()
             }
         }
     }
 
     private fun startBluetoothDiscovery() {
         if (bluetoothAdapter == null) {
-            SweetAlertDialog(this, SweetAlertDialog.ERROR_TYPE)
-                .setTitleText("Bluetooth no disponible")
-                .setContentText("Bluetooth no está disponible en este dispositivo")
-                .show()
+            Toast.makeText(this, "Bluetooth no está disponible en este dispositivo", Toast.LENGTH_LONG).show()
             return
         }
 
@@ -125,10 +148,7 @@ class connectPillbox : AppCompatActivity() {
         } else {
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED ||
                 ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-                SweetAlertDialog(this, SweetAlertDialog.ERROR_TYPE)
-                    .setTitleText("Permisos necesarios")
-                    .setContentText("Permisos necesarios no concedidos")
-                    .show()
+                Toast.makeText(this, "Permisos necesarios no concedidos", Toast.LENGTH_LONG).show()
                 return
             }
 
@@ -136,10 +156,7 @@ class connectPillbox : AppCompatActivity() {
                 bluetoothAdapter.cancelDiscovery()
             }
             bluetoothAdapter.startDiscovery()
-            SweetAlertDialog(this, SweetAlertDialog.SUCCESS_TYPE)
-                .setTitleText("Iniciando búsqueda")
-                .setContentText("Iniciando búsqueda de dispositivos")
-                .show()
+            Toast.makeText(this, "Iniciando búsqueda de dispositivos", Toast.LENGTH_SHORT).show()
 
             val filter = IntentFilter(BluetoothDevice.ACTION_FOUND)
             filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED)
@@ -149,40 +166,86 @@ class connectPillbox : AppCompatActivity() {
 
     private fun connectToDevice(deviceAddress: String) {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-            SweetAlertDialog(this, SweetAlertDialog.ERROR_TYPE)
-                .setTitleText("Permiso denegado")
-                .setContentText("Permiso de conexión Bluetooth no concedido")
-                .show()
+            Toast.makeText(this, "Permiso de conexión Bluetooth no concedido", Toast.LENGTH_LONG).show()
             return
         }
 
         val device = bluetoothAdapter?.getRemoteDevice(deviceAddress)
         device?.let {
             try {
-                // Reemplaza con el UUID adecuado para tu dispositivo
-                val uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB") // Ejemplo para SPP
+                val uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB")
                 val socket = device.createRfcommSocketToServiceRecord(uuid)
                 socket.connect()
 
-                SweetAlertDialog(this, SweetAlertDialog.SUCCESS_TYPE)
-                    .setTitleText("Conectado")
-                    .setContentText("Conectado a $deviceAddress")
-                    .show()
+                Toast.makeText(this, "Conectado a $deviceAddress", Toast.LENGTH_SHORT).show()
 
-                // Cierra el socket después de usarlo
-                socket.close()
+                val outputStream = socket.outputStream
+                val inputStream = socket.inputStream
+
+                // Guardar el outputStream y socket en el singleton
+                BluetoothManager.setOutputStream(outputStream, socket)
+                BluetoothManager.setInputStream(inputStream)
+
+                // Cambiar el ícono de la luz de estado a la palomita
+                val statusLight = findViewById<ImageView>(R.id.connection_status_light)
+                val connectionStatus = findViewById<TextView>(R.id.connection_status)
+                statusLight.setImageResource(R.drawable.successfull_bluetooth)
+                connectionStatus.text = "Estado: Conectado"
+
+                // Iniciar un hilo para monitorear la conexión
+                Thread {
+                    while (true) {
+                        if (!BluetoothManager.isConnected()) {
+                            runOnUiThread {
+                                statusLight.setImageResource(R.drawable.red_light)
+                                connectionStatus.text = "Estado: Desconectado"
+                                BluetoothManager.closeConnection()
+                            }
+                            break
+                        }
+                        Thread.sleep(1000)  // Verificación cada segundo
+                    }
+                }.start()
+
+                val readThread = Thread {
+                    receiveData(inputStream)
+                }
+                readThread.start()
+
             } catch (e: IOException) {
-                SweetAlertDialog(this, SweetAlertDialog.ERROR_TYPE)
-                    .setTitleText("Error de conexión")
-                    .setContentText("No se pudo conectar a $deviceAddress")
-                    .show()
+                Toast.makeText(this, "No se pudo conectar a $deviceAddress", Toast.LENGTH_SHORT).show()
                 e.printStackTrace()
             }
         } ?: run {
-            SweetAlertDialog(this, SweetAlertDialog.ERROR_TYPE)
-                .setTitleText("Dispositivo no encontrado")
-                .setContentText("No se encontró el dispositivo $deviceAddress")
-                .show()
+            Toast.makeText(this, "No se encontró el dispositivo $deviceAddress", Toast.LENGTH_LONG).show()
+        }
+    }
+
+
+
+
+    private fun sendData(outputStream: OutputStream, data: String) {
+        try {
+            outputStream.write(data.toByteArray())
+        } catch (e: IOException) {
+            Toast.makeText(this, "Error al enviar datos", Toast.LENGTH_SHORT).show()
+            e.printStackTrace()
+        }
+    }
+
+    private fun receiveData(inputStream: InputStream) {
+        val buffer = ByteArray(1024)
+        var bytes: Int
+
+        while (true) {
+            try {
+                bytes = inputStream.read(buffer)
+                val readMessage = String(buffer, 0, bytes)
+                handler.obtainMessage(0, readMessage).sendToTarget()
+            } catch (e: IOException) {
+                e.printStackTrace()
+                break
+            }
         }
     }
 
@@ -192,10 +255,7 @@ class connectPillbox : AppCompatActivity() {
             if (resultCode == RESULT_OK) {
                 startBluetoothDiscovery()
             } else {
-                SweetAlertDialog(this, SweetAlertDialog.ERROR_TYPE)
-                    .setTitleText("Bluetooth no habilitado")
-                    .setContentText("Bluetooth no habilitado")
-                    .show()
+                Toast.makeText(this, "Bluetooth no habilitado", Toast.LENGTH_LONG).show()
             }
         }
     }
@@ -204,4 +264,5 @@ class connectPillbox : AppCompatActivity() {
         super.onDestroy()
         unregisterReceiver(receiver)
     }
+
 }

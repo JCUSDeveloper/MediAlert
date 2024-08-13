@@ -1,5 +1,8 @@
 package com.example.medialert
 
+import android.app.AlertDialog
+import android.app.TimePickerDialog
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -7,6 +10,7 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.Button
 import android.widget.EditText
+import android.widget.NumberPicker
 import android.widget.Spinner
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
@@ -16,6 +20,7 @@ import androidx.core.view.WindowInsetsCompat
 import cn.pedant.SweetAlert.SweetAlertDialog
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import java.util.Calendar
 
 class editTreatment : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
@@ -51,6 +56,27 @@ class editTreatment : AppCompatActivity() {
 
             override fun onNothingSelected(parent: AdapterView<*>?) {
                 // No hacer nada
+            }
+        }
+
+        // Asignar TimePickerDialog a los campos de texto de tiempo
+        timeEditText.setOnClickListener {
+            val calendar = Calendar.getInstance()
+            val hour = calendar.get(Calendar.HOUR_OF_DAY)
+            val minute = calendar.get(Calendar.MINUTE)
+
+            val timePickerDialog = TimePickerDialog(
+                this, R.style.CustomTimePickerDialog,
+                { _, hourOfDay, minuteOfHour ->
+                    timeEditText.setText(String.format("%02d:%02d", hourOfDay, minuteOfHour))
+                }, hour, minute, true
+            )
+            timePickerDialog.show()
+        }
+
+        frequencyInput.setOnClickListener {
+            showHourPickerDialog(this) { hour ->
+                frequencyInput.setText(String.format("%02d:00", hour))
             }
         }
 
@@ -153,5 +179,21 @@ class editTreatment : AppCompatActivity() {
                         .show()
                 }
         }
+    }
+
+    private fun showHourPickerDialog(context: Context, onHourPicked: (Int) -> Unit) {
+        val numberPicker = NumberPicker(context)
+        numberPicker.minValue = 0
+        numberPicker.maxValue = 23
+        numberPicker.value = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+
+        val builder = AlertDialog.Builder(context)
+        builder.setTitle("Selecciona la hora")
+        builder.setView(numberPicker)
+        builder.setPositiveButton("OK") { _, _ ->
+            onHourPicked(numberPicker.value)
+        }
+        builder.setNegativeButton("Cancelar", null)
+        builder.show()
     }
 }

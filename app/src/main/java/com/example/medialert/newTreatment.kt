@@ -4,7 +4,6 @@ import android.app.AlertDialog
 import android.app.TimePickerDialog
 import android.content.Intent
 import android.graphics.Color
-import android.graphics.Paint
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.widget.*
@@ -13,6 +12,7 @@ import androidx.core.content.ContextCompat
 import cn.pedant.SweetAlert.SweetAlertDialog
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import java.io.IOException
 import java.util.Calendar
 
 class newTreatment : AppCompatActivity() {
@@ -27,7 +27,6 @@ class newTreatment : AppCompatActivity() {
         auth = FirebaseAuth.getInstance()
         db = FirebaseFirestore.getInstance()
 
-
         val treatmentNumberSpinner = findViewById<Spinner>(R.id.treatment_number_spinner)
         val medicineNameInput = findViewById<EditText>(R.id.medicine_name_input)
         val timeEditText = findViewById<EditText>(R.id.timeEditText)
@@ -35,7 +34,7 @@ class newTreatment : AppCompatActivity() {
         val doseInput = findViewById<EditText>(R.id.dose_input)
         val compartmentQuantityInput = findViewById<EditText>(R.id.compartment_quantity_input)
 
-        // Set up TimePickerDialog
+        // Set up TimePickerDialog for first dose time
         timeEditText.setOnClickListener {
             val calendar = Calendar.getInstance()
             val hour = calendar.get(Calendar.HOUR_OF_DAY)
@@ -50,31 +49,19 @@ class newTreatment : AppCompatActivity() {
             timePickerDialog.show()
         }
 
-
-        // Set up NumberPicker for frequency input
+        // Set up TimePickerDialog for frequency input
         frequencyInput.setOnClickListener {
-            val numberPicker = NumberPicker(this).apply {
-                minValue = 1
-                maxValue = 24
-                wrapSelectorWheel = true
-                // Apply custom styles to the NumberPicker
-                descendantFocusability = NumberPicker.FOCUS_BLOCK_DESCENDANTS
-                setBackgroundColor(ContextCompat.getColor(context, R.color.numberPickerBackground))
-                setDividerColor(this, ContextCompat.getColor(context, R.color.dark_green))
-                // Puedes agregar más personalizaciones aquí
-            }
+            val calendar = Calendar.getInstance()
+            val hour = calendar.get(Calendar.HOUR_OF_DAY)
+            val minute = calendar.get(Calendar.MINUTE)
 
-            AlertDialog.Builder(this, R.style.CustomAlertDialog)
-                .setTitle("Selecciona la frecuencia")
-                .setView(numberPicker)
-                .setPositiveButton("OK") { dialog, _ ->
-                    frequencyInput.setText(numberPicker.value.toString())
-                    dialog.dismiss()
-                }
-                .setNegativeButton("Cancelar") { dialog, _ ->
-                    dialog.dismiss()
-                }
-                .show()
+            val timePickerDialog = TimePickerDialog(
+                this, R.style.CustomTimePickerDialog,
+                { _, hourOfDay, minuteOfHour ->
+                    frequencyInput.setText(String.format("%02d:%02d", hourOfDay, minuteOfHour))
+                }, hour, minute, true
+            )
+            timePickerDialog.show()
         }
 
         // Save button click listener
@@ -109,6 +96,16 @@ class newTreatment : AppCompatActivity() {
                                 finish()
                             }
                             .show()
+
+                        // Enviar datos por Bluetooth
+                        val bluetoothMessage = "$firstDoseTime,$frequency,$medicineName,$treatmentNumber,$dose"
+                        try {
+                            BluetoothManager.sendData(bluetoothMessage)
+                            Toast.makeText(this, "Se Envio Correctamente por Bluetooth", Toast.LENGTH_SHORT).show()
+                        } catch (e: IOException) {
+                            Toast.makeText(this, "Error al enviar datos por Bluetooth", Toast.LENGTH_SHORT).show()
+                            e.printStackTrace()
+                        }
                     }
                     .addOnFailureListener { e ->
                         // Show failure alert
