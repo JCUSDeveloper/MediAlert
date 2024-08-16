@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
 import android.widget.NumberPicker
@@ -15,17 +16,23 @@ import android.widget.Spinner
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import cn.pedant.SweetAlert.SweetAlertDialog
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import java.io.IOException
 import java.util.Calendar
 
 class editTreatment : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
     private lateinit var db: FirebaseFirestore
     private var treatmentId: String? = null
+    private var selectedCompartment: String? = null
+    private var previousCompartment: String? = null
+    private lateinit var treatmentNumberSpinner: Spinner // Declara aquí
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,7 +47,7 @@ class editTreatment : AppCompatActivity() {
         auth = FirebaseAuth.getInstance()
         db = FirebaseFirestore.getInstance()
 
-        val treatmentNumberSpinner = findViewById<Spinner>(R.id.treatment_number_spinner)
+        treatmentNumberSpinner = findViewById<Spinner>(R.id.treatment_number_spinner)
         val medicineNameInput = findViewById<EditText>(R.id.medicine_name_input)
         val timeEditText = findViewById<EditText>(R.id.timeEditText)
         val frequencyInput = findViewById<EditText>(R.id.frequency_input)
@@ -50,14 +57,16 @@ class editTreatment : AppCompatActivity() {
         // Listener para el spinner de número de compartimiento
         treatmentNumberSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                val selectedCompartment = parent?.getItemAtPosition(position).toString()
-                loadTreatmentData(selectedCompartment, medicineNameInput, timeEditText, frequencyInput, doseInput, compartmentQuantityInput)
+                previousCompartment = selectedCompartment  // Guarda el valor actual antes de cambiarlo
+                selectedCompartment = parent?.getItemAtPosition(position).toString()
+                loadTreatmentData(selectedCompartment ?: "", medicineNameInput, timeEditText, frequencyInput, doseInput, compartmentQuantityInput)
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {
                 // No hacer nada
             }
         }
+
 
         // Asignar TimePickerDialog a los campos de texto de tiempo
         timeEditText.setOnClickListener {
@@ -71,23 +80,57 @@ class editTreatment : AppCompatActivity() {
                     timeEditText.setText(String.format("%02d:%02d", hourOfDay, minuteOfHour))
                 }, hour, minute, true
             )
+
+            timePickerDialog.setOnShowListener {
+                val positiveButton = timePickerDialog.getButton(AlertDialog.BUTTON_POSITIVE)
+                val negativeButton = timePickerDialog.getButton(AlertDialog.BUTTON_NEGATIVE)
+
+                positiveButton.setTextColor(ContextCompat.getColor(this, android.R.color.black))
+                negativeButton.setTextColor(ContextCompat.getColor(this, android.R.color.black))
+            }
+
             timePickerDialog.show()
         }
 
         frequencyInput.setOnClickListener {
-            showHourPickerDialog(this) { hour ->
-                frequencyInput.setText(String.format("%02d:00", hour))
+            val hour = 0
+            val minute = 0
+
+            val timePickerDialog = TimePickerDialog(
+                this, R.style.CustomTimePickerDialog,
+                { _, hourOfDay, minuteOfHour ->
+                    frequencyInput.setText(String.format("%02d:%02d", hourOfDay, minuteOfHour))
+                }, hour, minute, true
+            )
+
+            timePickerDialog.setOnShowListener {
+                val positiveButton = timePickerDialog.getButton(AlertDialog.BUTTON_POSITIVE)
+                val negativeButton = timePickerDialog.getButton(AlertDialog.BUTTON_NEGATIVE)
+
+                positiveButton.setTextColor(ContextCompat.getColor(this, android.R.color.black))
+                negativeButton.setTextColor(ContextCompat.getColor(this, android.R.color.black))
             }
+
+            timePickerDialog.show()
         }
 
         findViewById<Button>(R.id.save_button).setOnClickListener {
-            val medicineName = medicineNameInput.text.toString()
+            val medicineName = medicineNameInput.text.toString().trim().replace("\\s+".toRegex(), " ")
             val firstDoseTime = timeEditText.text.toString()
             val frequency = frequencyInput.text.toString()
             val dose = doseInput.text.toString()
             val compartmentQuantity = compartmentQuantityInput.text.toString()
 
-            if (medicineName.isNotEmpty() && firstDoseTime.isNotEmpty() && dose.isNotEmpty() && compartmentQuantity.isNotEmpty()) {
+            // Validar que dose y compartmentQuantity no sean ceros
+            if (dose == "0" || compartmentQuantity == "0" || dose == "00" || compartmentQuantity == "00") {
+                SweetAlertDialog(this, SweetAlertDialog.ERROR_TYPE)
+                    .setTitleText("Valor inválido")
+                    .setContentText("La dosis y la cantidad de compartimentos no pueden ser cero.")
+                    .show()
+                return@setOnClickListener
+            }
+
+            if (medicineName.isNotEmpty() && firstDoseTime.isNotEmpty() && dose.isNotEmpty() && compartmentQuantity.isNotEmpty() && frequency.isNotEmpty()) {
                 updateTreatmentData(medicineName, firstDoseTime, frequency, dose, compartmentQuantity)
             } else {
                 Toast.makeText(this, "Por favor, complete todos los campos.", Toast.LENGTH_SHORT).show()
@@ -126,7 +169,29 @@ class editTreatment : AppCompatActivity() {
                     SweetAlertDialog(this, SweetAlertDialog.ERROR_TYPE)
                         .setTitleText("Error")
                         .setContentText("No se encontró tratamiento para el compartimiento $compartmentNumber")
+                        .setConfirmClickListener { dialog ->
+                            treatmentNumberSpinner.onItemSelectedListener = null // Deshabilitar el listener
+                            treatmentNumberSpinner.setSelection(
+                                (treatmentNumberSpinner.adapter as ArrayAdapter<String>)
+                                    .getPosition(previousCompartment)
+                            )
+                            treatmentNumberSpinner.post { // Rehabilitar el listener después de un breve retraso
+                                treatmentNumberSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                                    override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                                        previousCompartment = selectedCompartment  // Guarda el valor actual antes de cambiarlo
+                                        selectedCompartment = parent?.getItemAtPosition(position).toString()
+                                        loadTreatmentData(selectedCompartment ?: "", medicineNameInput, timeEditText, frequencyInput, doseInput, compartmentQuantityInput)
+                                    }
+
+                                    override fun onNothingSelected(parent: AdapterView<*>?) {
+                                        // No hacer nada
+                                    }
+                                }
+                            }
+                            dialog.dismissWithAnimation() // Cerrar el diálogo
+                        }
                         .show()
+
                 }
             }
             .addOnFailureListener { exception ->
@@ -138,6 +203,7 @@ class editTreatment : AppCompatActivity() {
                     .show()
             }
     }
+
 
     private fun updateTreatmentData(medicineName: String, firstDoseTime: String, frequency: String, dose: String, compartmentQuantity: String) {
         val userId = auth.currentUser?.uid ?: return
@@ -160,6 +226,16 @@ class editTreatment : AppCompatActivity() {
                 .update(treatmentData as Map<String, Any>)
                 .addOnSuccessListener {
                     updatingDialog.dismissWithAnimation()
+
+                    val bluetoothMessage = "$firstDoseTime,$frequency,$medicineName,$selectedCompartment,$dose"
+                    try {
+                        BluetoothManager.sendData(bluetoothMessage)
+                        Toast.makeText(this, "Se Envio Correctamente por Bluetooth", Toast.LENGTH_SHORT).show()
+                    } catch (e: IOException) {
+                        Toast.makeText(this, "Error al enviar datos por Bluetooth", Toast.LENGTH_SHORT).show()
+                        e.printStackTrace()
+
+                    }
                     SweetAlertDialog(this, SweetAlertDialog.SUCCESS_TYPE)
                         .setTitleText("Éxito")
                         .setContentText("Tratamiento actualizado exitosamente.")

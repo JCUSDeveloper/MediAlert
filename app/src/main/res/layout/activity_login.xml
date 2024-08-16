@@ -14,7 +14,7 @@
         android:src="@drawable/logo"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        tools:layout_editor_absoluteY="0dp" />
+        tools:ignore="MissingConstraints" />
 
     <TextView
         android:id="@+id/welcome_message"
@@ -80,11 +80,17 @@
                 android:id="@+id/password_input"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="26dp"
                 android:hint="Ingrese su contraseña"
                 android:inputType="textPassword"
                 android:padding="16dp"
                 android:textColor="@color/light_gray" /> <!-- Espacio entre el input y el botón -->
+
+            <CheckBox
+                android:id="@+id/cbxFavorito"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Recuerdamelo"
+                android:textColor="@color/black"/>
 
             <Button
                 android:id="@+id/login_button"

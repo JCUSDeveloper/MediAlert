@@ -98,7 +98,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="3. Selecciona la hora de la 1era toma."
+                android:text="3. Selecciona la hora de la 1ra toma (HH:MM)."
                 android:textSize="14sp"
                 android:layout_marginBottom="8dp"
                 android:textColor="@color/dark_gray"
@@ -120,7 +120,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="4. Frecuencia (Por Hora)"
+                android:text="4. Frecuencia (HH:MM)."
                 android:textSize="14sp"
                 android:layout_marginBottom="8dp"
                 android:textColor="@color/dark_gray"
@@ -144,7 +144,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
-                android:text="5. Escribe la dosis de medicamento por toma."
+                android:text="5. Escribe la dosis de medicamento por toma (Nº Píld)."
                 android:textColor="@color/dark_gray"
                 android:textSize="14sp"
                 android:textStyle="bold" />
@@ -153,7 +153,7 @@
                 android:id="@+id/dose_input"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Dosis"
+                android:hint="Ejemplo: 5 Pildoras"
                 android:maxLength="2"
                 android:textSize="16dp"
                 android:textColor="@color/dark_gray"
@@ -165,7 +165,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
-                android:text="6. Escribe la cantidad de medicamento en el compartimiento."
+                android:text="6. Escribe la cantidad de medicamento en el compartimiento (Nº Píld)."
                 android:textColor="@color/dark_gray"
                 android:textSize="14sp"
                 android:textStyle="bold" />
@@ -174,7 +174,7 @@
                 android:id="@+id/compartment_quantity_input"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Cantidad"
+                android:hint="Ejemplo: 5 Pildoras"
                 android:textSize="16dp"
                 android:maxLength="2"
                 android:inputType="number"

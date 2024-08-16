@@ -22,6 +22,8 @@ import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
 import java.util.UUID
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 class connectPillbox : AppCompatActivity() {
     private val PERMISSION_REQUEST_CODE = 101
@@ -32,18 +34,22 @@ class connectPillbox : AppCompatActivity() {
     private val deviceListAdapter by lazy {
         DeviceListAdapter(this, mutableListOf())
     }
+    private lateinit var auth: FirebaseAuth
+    private lateinit var firestore: FirebaseFirestore
+
 
     private val handler = Handler(Looper.getMainLooper()) { message ->
-        //PRUEBA ENVIO DE DATOS
-        val receivdedData = message.obj as String
+        // PRUEBA ENVIO DE DATOS
+        val receivedData = message.obj as String
         true
     }
 
+    // BroadcastReceiver para recibir dispositivos encontrados durante la búsqueda
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             when (intent?.action) {
                 BluetoothDevice.ACTION_FOUND -> {
-                    val device: BluetoothDevice? = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
+                    val device: BluetoothDevice? = intent?.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
                     device?.let {
                         val deviceName = if (ActivityCompat.checkSelfPermission(
                                 this@connectPillbox,
@@ -66,6 +72,27 @@ class connectPillbox : AppCompatActivity() {
         }
     }
 
+    // BroadcastReceiver para detectar cambios en el estado del Bluetooth
+    private val bluetoothStateReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            when (intent?.action) {
+                BluetoothAdapter.ACTION_STATE_CHANGED -> {
+                    val state = intent?.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR)
+                    if (state == BluetoothAdapter.STATE_OFF) {
+                        // Cambiar el ícono de la luz de estado a la luz roja
+                        val statusLight = findViewById<ImageView>(R.id.connection_status_light)
+                        val connectionStatus = findViewById<TextView>(R.id.connection_status)
+                        statusLight.setImageResource(R.drawable.red_light)
+                        connectionStatus.text = "Estado: Desconectado"
+
+                        // Cerrar la conexión Bluetooth
+                        BluetoothManager.closeConnection()
+                    }
+                }
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -78,6 +105,9 @@ class connectPillbox : AppCompatActivity() {
             val deviceAddress = deviceInfo.split(" - ").last()
             connectToDevice(deviceAddress)
         }
+
+        auth = FirebaseAuth.getInstance()
+        firestore = FirebaseFirestore.getInstance()
 
         val statusLight = findViewById<ImageView>(R.id.connection_status_light)
         val connectionStatus = findViewById<TextView>(R.id.connection_status)
@@ -102,9 +132,33 @@ class connectPillbox : AppCompatActivity() {
             val intent = Intent(this, menu::class.java)
             startActivity(intent)
         }
+
+        // Registrar el BroadcastReceiver para cambios en el estado del Bluetooth
+        val filter = IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED)
+        registerReceiver(bluetoothStateReceiver, filter)
+
+        findViewById<ImageView>(R.id.user).setOnClickListener {
+            val currentUser = auth.currentUser
+            if (currentUser != null) {
+                // Obtén los datos del usuario desde Firestore
+                val userRef = firestore.collection("users").document(currentUser.uid)
+                userRef.get().addOnSuccessListener { document ->
+                    if (document != null) {
+                        val email = document.getString("email")
+                        val name = document.getString("name")
+                        val birthdate = document.getString("birthdate")
+
+                        // Pasa los datos a la actividad profile
+                        val intent = Intent(this, profile::class.java)
+                        intent.putExtra("email", email)
+                        intent.putExtra("name", name)
+                        intent.putExtra("birthdate", birthdate)
+                        startActivity(intent)
+                    }
+                }
+            }
+        }
     }
-
-
 
     private fun checkPermissions() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH) != PackageManager.PERMISSION_GRANTED ||
@@ -194,7 +248,7 @@ class connectPillbox : AppCompatActivity() {
 
                 // Iniciar un hilo para monitorear la conexión
                 Thread {
-                    while (true) {
+                    while (BluetoothManager.isConnected()) {
                         if (!BluetoothManager.isConnected()) {
                             runOnUiThread {
                                 statusLight.setImageResource(R.drawable.red_light)
@@ -220,9 +274,6 @@ class connectPillbox : AppCompatActivity() {
             Toast.makeText(this, "No se encontró el dispositivo $deviceAddress", Toast.LENGTH_LONG).show()
         }
     }
-
-
-
 
     private fun sendData(outputStream: OutputStream, data: String) {
         try {
@@ -263,6 +314,6 @@ class connectPillbox : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         unregisterReceiver(receiver)
+        unregisterReceiver(bluetoothStateReceiver) // Asegúrate de anular el registro del nuevo BroadcastReceiver
     }
-
 }

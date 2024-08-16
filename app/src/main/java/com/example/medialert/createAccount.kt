@@ -33,6 +33,11 @@ class createAccount : AppCompatActivity() {
             insets
         }
 
+        findViewById<Button>(R.id.volver).setOnClickListener {
+            finish()
+        }
+
+
         // Inicializa Firebase Auth y Firestore
         auth = FirebaseAuth.getInstance()
         db = FirebaseFirestore.getInstance()

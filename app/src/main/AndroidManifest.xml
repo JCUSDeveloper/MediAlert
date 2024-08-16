@@ -16,7 +16,7 @@
             android:name=".profile"
             android:exported="false" />
         <activity
-            android:name=".MainActivity"
+            android:name=".newTreatment"
             android:exported="false" />
         <activity
             android:name=".menu"
@@ -38,7 +38,7 @@
             android:exported="false"
             android:theme="@style/Theme.MediAlert" />
         <activity
-            android:name=".newTreatment"
+            android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

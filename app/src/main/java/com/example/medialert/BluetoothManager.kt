@@ -33,24 +33,61 @@ object BluetoothManager {
     @Throws(IOException::class)
     fun sendData(data: String) {
         outputStream?.let {
-            it.write(data.toByteArray())
+            try {
+                it.write(data.toByteArray())
+                it.flush()  // Asegúrate de que los datos se envíen de inmediato
+            } catch (e: IOException) {
+                e.printStackTrace()
+                closeConnection()  // Maneja la desconexión
+                throw IOException("Connection lost")
+            }
         } ?: throw IOException("OutputStream not initialized")
     }
 
+
     fun receiveData(): String {
-        val buffer = ByteArray(1024)
+        val buffer = StringBuilder()
+        val timeout = 5000  // 5 segundos de timeout
+        val startTime = System.currentTimeMillis()
+
         return try {
-            val bytes = inputStream?.read(buffer) ?: 0
-            String(buffer, 0, bytes)
+            while (System.currentTimeMillis() - startTime < timeout) {
+                if (inputStream?.available() ?: 0 > 0) {
+                    val byte = inputStream?.read()
+                    if (byte != null && byte != -1) {
+                        val char = byte.toChar()
+                        buffer.append(char)
+                        if (char == '\n') {
+                            break  // Fin de línea, terminamos la lectura
+                        }
+                    }
+                }
+            }
+
+            if (buffer.isNotEmpty()) {
+                buffer.toString().trim()  // Devuelve la cadena recibida, sin espacios en blanco adicionales
+            } else {
+                "ERROR: No se recibió respuesta"  // Si no se recibe nada
+            }
         } catch (e: IOException) {
             e.printStackTrace()
-            closeConnection()  // Handle disconnection
-            ""
+            closeConnection()  // Maneja la desconexión
+            "ERROR: Fallo en la conexión"  // Mensaje de error si hay una excepción
         }
     }
 
-
     fun isConnected(): Boolean {
-        return isConnected && socket?.isConnected == true
+        return isConnected && socket?.isConnected == true && !checkDisconnection()
+    }
+
+    private fun checkDisconnection(): Boolean {
+        // Si la conexión se pierde, esto capturará la excepción y cerrará la conexión
+        try {
+            socket?.inputStream?.available()
+            return false
+        } catch (e: IOException) {
+            closeConnection()
+            return true
+        }
     }
 }
