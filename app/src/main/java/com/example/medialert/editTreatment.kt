@@ -1,5 +1,6 @@
 package com.example.medialert
 
+import android.app.AlarmManager
 import android.app.AlertDialog
 import android.app.TimePickerDialog
 import android.content.Context
@@ -11,7 +12,6 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
-import android.widget.NumberPicker
 import android.widget.Spinner
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
@@ -24,6 +24,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import java.io.IOException
 import java.util.Calendar
+import android.app.PendingIntent
+import android.os.Build
 
 class editTreatment : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
@@ -236,6 +238,11 @@ class editTreatment : AppCompatActivity() {
                         e.printStackTrace()
 
                     }
+
+                    // Programar la notificación
+                    scheduleNotification(selectedCompartment ?: "", medicineName, firstDoseTime, dose, frequency)
+
+
                     SweetAlertDialog(this, SweetAlertDialog.SUCCESS_TYPE)
                         .setTitleText("Éxito")
                         .setContentText("Tratamiento actualizado exitosamente.")
@@ -255,21 +262,76 @@ class editTreatment : AppCompatActivity() {
                         .show()
                 }
         }
+
     }
 
-    private fun showHourPickerDialog(context: Context, onHourPicked: (Int) -> Unit) {
-        val numberPicker = NumberPicker(context)
-        numberPicker.minValue = 0
-        numberPicker.maxValue = 23
-        numberPicker.value = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+    private fun scheduleNotification(treatmentNumber: String, medicineName: String, firstDoseTime: String, dose: String, frequency: String) {
+        // Verificar si la frecuencia es "00:00" o la primera dosis es "00:00", en ese caso no programar la alarma
+        if (frequency == "00:00" || firstDoseTime == "00:00") {
+            // Cancelar cualquier alarma previa asociada a este tratamiento
+            val intent = Intent(this, NotificationReceiver::class.java)
+            val pendingIntent = PendingIntent.getBroadcast(
+                this,
+                treatmentNumber.hashCode(),
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+            val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+            alarmManager.cancel(pendingIntent)
 
-        val builder = AlertDialog.Builder(context)
-        builder.setTitle("Selecciona la hora")
-        builder.setView(numberPicker)
-        builder.setPositiveButton("OK") { _, _ ->
-            onHourPicked(numberPicker.value)
+            // No programar ninguna nueva alarma
+            return
         }
-        builder.setNegativeButton("Cancelar", null)
-        builder.show()
+
+        val currentTime = Calendar.getInstance()
+        val firstDoseParts = firstDoseTime.split(":").map { it.toInt() }
+        val firstDoseCalendar = Calendar.getInstance().apply {
+            set(Calendar.HOUR_OF_DAY, firstDoseParts[0])
+            set(Calendar.MINUTE, firstDoseParts[1])
+            set(Calendar.SECOND, 0)
+        }
+
+        val frequencyParts = frequency.split(":").map { it.toInt() }
+        val totalFrequencyMinutes = frequencyParts[0] * 60 + frequencyParts[1]
+
+        // Verifica si la primera toma es en el pasado y ajusta la hora de la primera alarma
+        if (firstDoseCalendar.before(currentTime)) {
+            // Calcula el tiempo en minutos desde la hora configurada hasta la hora actual
+            val minutesSinceFirstDose = (currentTime.get(Calendar.HOUR_OF_DAY) * 60 + currentTime.get(Calendar.MINUTE)) -
+                    (firstDoseCalendar.get(Calendar.HOUR_OF_DAY) * 60 + firstDoseCalendar.get(Calendar.MINUTE))
+
+            // Calcula cuántos intervalos de frecuencia han pasado
+            val intervalsPassed = minutesSinceFirstDose / totalFrequencyMinutes
+
+            // Ajusta la siguiente alarma al próximo intervalo futuro
+            firstDoseCalendar.add(Calendar.MINUTE, (intervalsPassed + 1) * totalFrequencyMinutes)
+        }
+
+        // Configurar el intent y el pending intent para la alarma
+        val intent = Intent(this, NotificationReceiver::class.java).apply {
+            putExtra("treatmentNumber", treatmentNumber)
+            putExtra("medicineName", medicineName)
+            putExtra("firstDoseTime", String.format("%02d:%02d", firstDoseCalendar.get(Calendar.HOUR_OF_DAY), firstDoseCalendar.get(Calendar.MINUTE)))
+            putExtra("dose", dose)
+            putExtra("frequency", frequency)  // Pasa la frecuencia para reprogramar
+        }
+
+        val pendingIntent = PendingIntent.getBroadcast(
+            this,
+            treatmentNumber.hashCode(),
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        // Programar la alarma para la primera dosis ajustada
+        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        alarmManager.setExactAndAllowWhileIdle(
+            AlarmManager.RTC_WAKEUP,
+            firstDoseCalendar.timeInMillis,
+            pendingIntent
+        )
     }
+
+
+
 }

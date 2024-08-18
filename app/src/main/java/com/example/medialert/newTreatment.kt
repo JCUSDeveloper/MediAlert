@@ -1,9 +1,11 @@
 package com.example.medialert
 
+import android.app.AlarmManager
 import android.app.AlertDialog
+import android.app.PendingIntent
 import android.app.TimePickerDialog
+import android.content.Context
 import android.content.Intent
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
@@ -124,6 +126,7 @@ class newTreatment : AppCompatActivity() {
                                 .set(treatmentData)
                                 .addOnSuccessListener {
                                     showSuccessAlert()
+                                    scheduleNotification(treatmentNumber, medicineName, firstDoseTime, dose, frequency)
                                     sendBluetoothData(firstDoseTime, frequency, medicineName, treatmentNumber, dose)
                                 }
                                 .addOnFailureListener { e ->
@@ -135,6 +138,7 @@ class newTreatment : AppCompatActivity() {
                                 .add(treatmentData)
                                 .addOnSuccessListener {
                                     showSuccessAlert()
+                                    scheduleNotification(treatmentNumber, medicineName, firstDoseTime, dose, frequency)
                                     sendBluetoothData(firstDoseTime, frequency, medicineName, treatmentNumber, dose)
                                 }
                                 .addOnFailureListener { e ->
@@ -152,6 +156,7 @@ class newTreatment : AppCompatActivity() {
                     .show()
             }
         }
+
 
 
         // Cancel button click listener
@@ -193,19 +198,74 @@ class newTreatment : AppCompatActivity() {
         }
     }
 
-    private fun setDividerColor(picker: NumberPicker, color: Int) {
-        try {
-            val fields = NumberPicker::class.java.declaredFields
-            for (field in fields) {
-                if (field.name == "mSelectionDivider") {
-                    field.isAccessible = true
-                    val colorDrawable = ColorDrawable(color)
-                    field.set(picker, colorDrawable)
-                    break
-                }
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
+    private fun scheduleNotification(treatmentNumber: String, medicineName: String, firstDoseTime: String, dose: String, frequency: String) {
+        // Verificar si la frecuencia es "00:00" o la primera dosis es "00:00", en ese caso no programar la alarma
+        if (frequency == "00:00" || firstDoseTime == "00:00") {
+            // Cancelar cualquier alarma previa asociada a este tratamiento
+            val intent = Intent(this, NotificationReceiver::class.java)
+            val pendingIntent = PendingIntent.getBroadcast(
+                this,
+                treatmentNumber.hashCode(),
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+            val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+            alarmManager.cancel(pendingIntent)
+
+            // No programar ninguna nueva alarma
+            return
         }
+
+        val currentTime = Calendar.getInstance()
+        val firstDoseParts = firstDoseTime.split(":").map { it.toInt() }
+        val firstDoseCalendar = Calendar.getInstance().apply {
+            set(Calendar.HOUR_OF_DAY, firstDoseParts[0])
+            set(Calendar.MINUTE, firstDoseParts[1])
+            set(Calendar.SECOND, 0)
+        }
+
+        val frequencyParts = frequency.split(":").map { it.toInt() }
+        val totalFrequencyMinutes = frequencyParts[0] * 60 + frequencyParts[1]
+
+        // Verifica si la primera toma es en el pasado y ajusta la hora de la primera alarma
+        if (firstDoseCalendar.before(currentTime)) {
+            // Calcula el tiempo en minutos desde la hora configurada hasta la hora actual
+            val minutesSinceFirstDose = (currentTime.get(Calendar.HOUR_OF_DAY) * 60 + currentTime.get(Calendar.MINUTE)) -
+                    (firstDoseCalendar.get(Calendar.HOUR_OF_DAY) * 60 + firstDoseCalendar.get(Calendar.MINUTE))
+
+            // Calcula cuántos intervalos de frecuencia han pasado
+            val intervalsPassed = minutesSinceFirstDose / totalFrequencyMinutes
+
+            // Ajusta la siguiente alarma al próximo intervalo futuro
+            firstDoseCalendar.add(Calendar.MINUTE, (intervalsPassed + 1) * totalFrequencyMinutes)
+        }
+
+        // Configurar el intent y el pending intent para la alarma
+        val intent = Intent(this, NotificationReceiver::class.java).apply {
+            putExtra("treatmentNumber", treatmentNumber)
+            putExtra("medicineName", medicineName)
+            putExtra("firstDoseTime", String.format("%02d:%02d", firstDoseCalendar.get(Calendar.HOUR_OF_DAY), firstDoseCalendar.get(Calendar.MINUTE)))
+            putExtra("dose", dose)
+            putExtra("frequency", frequency)  // Pasa la frecuencia para reprogramar
+        }
+
+        val pendingIntent = PendingIntent.getBroadcast(
+            this,
+            treatmentNumber.hashCode(),
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        // Programar la alarma para la primera dosis ajustada
+        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        alarmManager.setExactAndAllowWhileIdle(
+            AlarmManager.RTC_WAKEUP,
+            firstDoseCalendar.timeInMillis,
+            pendingIntent
+        )
     }
+
+
+
+
 }
